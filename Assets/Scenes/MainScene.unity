@@ -267,6 +267,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 175679308}
+  - component: {fileID: 175679309}
   m_Layer: 5
   m_Name: Word Texts
   m_TagString: Untagged
@@ -297,6 +298,21 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &175679309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175679307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7711c591929ada4995cab1886cc9466, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Kanji: {fileID: 654462296}
+  Furigana: {fileID: 1584643571}
+  Meaning: {fileID: 1711025105}
 --- !u!1 &315725772
 GameObject:
   m_ObjectHideFlags: 0
@@ -668,7 +684,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 792509888}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 175679309}
+        m_TargetAssemblyTypeName: WordUpdater, Assembly-CSharp
+        m_MethodName: PreviousWord
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: PreviousWord
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &792509888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -806,7 +834,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 910852080}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 175679309}
+        m_TargetAssemblyTypeName: WordUpdater, Assembly-CSharp
+        m_MethodName: NextWord
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &910852080
 MonoBehaviour:
   m_ObjectHideFlags: 0
