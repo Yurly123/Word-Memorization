@@ -12,13 +12,12 @@ public class WordUpdater : MonoBehaviour
     public TextMeshProUGUI KanjiText;
     public TextMeshProUGUI FuriganaText;
     public TextMeshProUGUI MeaningText;
+    public TextMeshProUGUI WordIndexText;
     
     List<Word> WordList = new List<Word>();
     int index = 0;
     // Start is called before the first frame update
     void Awake() {
-        WordList.Add(new Word("青い", "あおい", "파랗다"));
-        WordList.Add(new Word("味", "あじ", "맛"));
         RandomizeWordList();
     }
 
@@ -28,6 +27,7 @@ public class WordUpdater : MonoBehaviour
         KanjiText.text = word.Kanji;
         FuriganaText.text = word.Furigana;
         MeaningText.text = word.Meaning;
+        WordIndexText.text = (index + 1).ToString();
     }
 
     private void Start() {
@@ -118,6 +118,7 @@ public class WordUpdater : MonoBehaviour
                 WordList.Add(XmlWord);
             }
         }
+        WordList = WordList.OrderBy(Word => Word.Furigana).ToList();
         SaveWordList();
     }
     void SaveWordList()
