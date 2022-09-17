@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using System.Xml;
-using System.IO;
 using System.Linq;
 
 public class WordUpdater : MonoBehaviour
@@ -13,21 +11,43 @@ public class WordUpdater : MonoBehaviour
     public TextMeshProUGUI FuriganaText;
     public TextMeshProUGUI MeaningText;
     public TextMeshProUGUI WordIndexText;
+    public GameObject CheckMark;
+    public TextMeshProUGUI CheckFilterText;
     
     List<Word> WordList = new List<Word>();
     int index = 0;
+    bool CheckFilter = false;
     // Start is called before the first frame update
     void Awake() {
+        WordList = WordXmlIO.LoadWordList();
         RandomizeWordList();
     }
 
     void UpdateWord(int index)
     {
+        if (CheckFilter)
+        {
+            while (!WordList[index].Checked)
+            {
+                ++index;
+                if (index >= WordList.Count())
+                {
+                    index = 0;
+                }
+                if (index == this.index)
+                {
+                    CheckedFilter();
+                    break;
+                }
+            }
+            this.index = index;
+        }
         Word word = WordList[index];
         KanjiText.text = word.Kanji;
         FuriganaText.text = word.Furigana;
         MeaningText.text = word.Meaning;
         WordIndexText.text = (index + 1).ToString();
+        UpdateCheckMark(index);
     }
 
     private void Start() {
@@ -42,23 +62,41 @@ public class WordUpdater : MonoBehaviour
 
     public void PreviousWord()
     {
-        if(index > 0)
+        if(index <= 0)
+            index = WordList.Count;
+        if (CheckFilter)
         {
-            UpdateWord(--index);
+            --index;
+            int OriginalIndex = index;
+            while (!WordList[index].Checked)
+            {
+                --index;
+                if (index < 0)
+                {
+                    index = WordList.Count() - 1;
+                }
+                if (index == OriginalIndex)
+                {
+                    CheckedFilter();
+                    break;
+                }
+            }
+            ++index;
         }
+        UpdateWord(--index);
     }
 
     public void NextWord()
     {
-        if(index < WordList.Count - 1)
-        {
-            UpdateWord(++index);
-        }
+        if(index >= WordList.Count() - 1)
+            index = -1;
+        UpdateWord(++index);
     }
 
     public void RandomizeWordList()
     {
-        LoadWordList();
+        WordXmlIO.SaveWordList(WordList);
+        WordList = WordXmlIO.LoadWordList();
         for (int i = 0; i < WordList.Count; ++i)
         {
             int RandIndex = Random.Range(0, WordList.Count);
@@ -70,82 +108,58 @@ public class WordUpdater : MonoBehaviour
         UpdateWord(index);
     }
 
-    void LoadWordList()
+    void UpdateCheckMark(int index)
     {
-        XmlDocument Document = new XmlDocument();
-        List<Word> XmlWordList = new List<Word>();
-        try
+        if (WordList[index].Checked)
         {
-            Document.Load(Application.persistentDataPath + @"\Words.xml");
-            XmlElement Words = Document["Words"];
-
-            foreach (XmlElement Word in Words.ChildNodes)
-            {
-                Word word = new Word();
-                word.Kanji = Word.GetAttribute("한자");
-                word.Furigana = Word.GetAttribute("후리가나");
-                word.Meaning = Word.GetAttribute("의미");
-                XmlWordList.Add(word);
-            }
+            CheckMark.SetActive(true);
         }
-        catch { }
-
-        try
+        else
         {
-            Document.Load(Application.dataPath + @"\Words.xml");
-            XmlElement Words = Document["Words"];
-
-            foreach (XmlElement Word in Words.ChildNodes)
-            {
-                Word word = new Word();
-                word.Kanji = Word.GetAttribute("한자");
-                word.Furigana = Word.GetAttribute("후리가나");
-                word.Meaning = Word.GetAttribute("의미");
-                XmlWordList.Add(word);
-            }
+            CheckMark.SetActive(false);
         }
-        catch { }
-
-        foreach (Word XmlWord in XmlWordList)
-        {
-            var OverlappingWords = from Word in WordList
-                                   where Word.Kanji == XmlWord.Kanji
-                                   where Word.Furigana == XmlWord.Furigana
-                                   where Word.Meaning == Word.Meaning
-                                   select Word;
-            if (OverlappingWords.Count() == 0)
-            {
-                WordList.Add(XmlWord);
-            }
-        }
-        WordList = WordList.OrderBy(Word => Word.Furigana).ToList();
-        SaveWordList();
     }
-    void SaveWordList()
+    public void CheckCurrentWord()
     {
-        XmlDocument Document = new XmlDocument();
-        XmlElement Words = Document.CreateElement("Words");
-        Document.AppendChild(Words);
- 
-        foreach (var Word in WordList)
+        if (WordList[index].Checked)
         {
-            XmlElement WordElement = Document.CreateElement("Word");
-            WordElement.SetAttribute("한자", Word.Kanji);
-            WordElement.SetAttribute("후리가나", Word.Furigana);
-            WordElement.SetAttribute("의미", Word.Meaning);
-            Words.AppendChild(WordElement);
+            WordList[index].Checked = false;
         }
+        else
+        {
+            WordList[index].Checked = true;
+        }
+        UpdateCheckMark(index);
+    }
 
-        Document.Save(Application.persistentDataPath + @"\Words.xml");
-        Document.Save(Application.dataPath + @"\Words.xml");
+    private void OnApplicationQuit() {
+        WordXmlIO.SaveWordList(WordList);
+    }
+
+    public void CheckedFilter()
+    {
+        if (CheckFilter)
+        {
+            CheckFilterText.text = "☆만 표시 : X";
+            CheckFilterText.color = new Color(1, 1, 1, 1);
+            CheckFilter = false;
+        }
+        else
+        {
+            CheckFilterText.text = "☆만 표시 : O";
+            CheckFilterText.color = new Color(1, 1, 0, 1);
+            CheckFilter = true;
+        }
+        UpdateWord(index);
     }
 }
 
-class Word
+public class Word
 {
     public string Kanji { get; set; }
     public string Furigana { get; set; }
     public string Meaning { get; set; }
+    public bool Checked { get; set;}
     public Word(string Kanji, string Furigana, string Meaning)
     {
         this.Kanji = Kanji;
