@@ -14,7 +14,7 @@ public class WordXmlIO : MonoBehaviour
         List<Word> XmlWordList = new List<Word>();
         try
         {
-            Document.Load(Application.persistentDataPath + @"\Words.xml");
+            Document.Load(Application.persistentDataPath + "/Words.xml");
             XmlElement Words = Document["Words"];
 
             foreach (XmlElement Word in Words.ChildNodes)
@@ -31,7 +31,7 @@ public class WordXmlIO : MonoBehaviour
 
         try
         {
-            Document.Load(Application.dataPath + @"\Words.xml");
+            Document.Load(Application.dataPath + "/Resources/Words.xml");
             XmlElement Words = Document["Words"];
 
             foreach (XmlElement Word in Words.ChildNodes)
@@ -56,12 +56,13 @@ public class WordXmlIO : MonoBehaviour
                 WordList.Add(XmlWord);
             }
         }
-        SaveWordList(WordList);
         return WordList;
     }
     
     public static void SaveWordList(List<Word> WordList)
     {
+        if (WordList.Count() == 0)
+            WordList.Add(new Word("野獣先輩", "やじゅうせんぱい", "야수선배"));
         WordList = WordList.OrderBy(Word => Word.Furigana).ToList();
         XmlDocument Document = new XmlDocument();
         XmlElement Words = Document.CreateElement("Words");
@@ -78,7 +79,8 @@ public class WordXmlIO : MonoBehaviour
             Words.AppendChild(WordElement);
         }
 
-        Document.Save(Application.persistentDataPath + @"\Words.xml");
-        Document.Save(Application.dataPath + @"\Words.xml");
+        Document.Save(Application.persistentDataPath + "/Words.xml");
+        try { Document.Save(Application.dataPath + "/Resources/Words.xml"); }
+        catch { }
     }
 }

@@ -20,6 +20,7 @@ public class WordUpdater : MonoBehaviour
     // Start is called before the first frame update
     void Awake() {
         WordList = WordXmlIO.LoadWordList();
+        WordXmlIO.SaveWordList(WordList);
         RandomizeWordList();
     }
 
