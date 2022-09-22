@@ -48,7 +48,11 @@ public class WordUpdater : MonoBehaviour
         FuriganaText.text = word.Furigana;
         MeaningText.text = word.Meaning;
         WordIndexText.text = (index + 1).ToString();
-        if (KanjiText.text.Length > 4)
+        if (KanjiText.text.Length > 90)
+        {
+            KanjiText.fontSize = 32;
+        }
+        else if (KanjiText.text.Length > 4)
         {
             KanjiText.fontSize = 128;
         }
